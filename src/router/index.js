@@ -1,17 +1,21 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
-// Define your routes (at least an empty array if none are ready)
 const routes = [
   {
-    path: '/',
-    name : 'PollLoginPage',
-    component: () => import("../components/PollLoginPage.vue"), 
-  }
+    path: "/",
+    name: "PollLoginPage",
+    component: () => import("../pages/LoginPage.vue"),
+  },
+  {
+    path: "/poll-list",
+    name: "PollPage",
+    component: () => import("../pages/PollPage.vue"),
+  },
 ];
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes // <-- You need to pass this array
+  routes,
 });
 
 export default router;

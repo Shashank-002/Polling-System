@@ -1,9 +1,11 @@
 <template>
-  <PollLoginPage />
+  <div id="app">
+    <router-view></router-view>
+  </div>
 </template>
 
 <script setup>
-import PollLoginPage from './components/PollLoginPage.vue';
+
 </script>
 
 <style>

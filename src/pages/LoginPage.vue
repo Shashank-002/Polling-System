@@ -19,7 +19,7 @@
                         }}</p>
                 </div>
 
-                <div class="mb-6 relative">
+                <div class="mb-6 relative min-h-[110px]">
                     <label class="block text-gray-700 text-left font-semibold mb-2" for="password">
                         Password
                     </label>
@@ -37,7 +37,8 @@
                         authStore.passwordError }}</p>
                 </div>
 
-
+                <!-- Show API Login error if any -->
+                <p v-if="authStore.loginError" class="text-red-500 text-center mb-4">{{ authStore.loginError }}</p>
 
                 <div class="flex items-center justify-center">
                     <button type="submit"
@@ -61,25 +62,22 @@ import { ref } from 'vue';
 
 const authStore = useAuthStore();
 const router = useRouter();
-const showPassword = ref(false); // State to toggle password visibility
+const showPassword = ref(false);
 
-const handleLogin = () => {
-    // Perform final validation before navigating
-    authStore.validateEmail();
-    authStore.validatePassword();
+const handleLogin = async () => {
+    const loginSuccess = await authStore.login();
 
     // Navigate only if there are no errors
-    if (!authStore.emailError && !authStore.passwordError) {
+    if (loginSuccess) {
         router.push("/poll-list");
+    } else {
+        console.log("Login failed, not redirecting.");
     }
 };
+
 
 // Function to toggle password visibility
 const togglePasswordVisibility = () => {
     showPassword.value = !showPassword.value;
 };
 </script>
-
-<style scoped>
-/* Your styles here */
-</style>
