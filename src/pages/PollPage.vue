@@ -4,10 +4,6 @@
         <p class="text-red-500">No poll available! at the moment.</p>
     </div>
 </template>
-<script>
-export default {
-    setup() {
+<script setup>
 
-    },
-}
 </script>

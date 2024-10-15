@@ -11,32 +11,28 @@ export const useAuthStore = defineStore("auth", () => {
   const passwordError = ref("");
   const loginError = ref("");
 
-  // Validate email
-  const validateEmail = () => {
+  const validateCredentials = (field) => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.value) {
-      emailError.value = "Email is required.";
-    } else if (!emailPattern.test(email.value)) {
-      emailError.value = "Please enter a valid email address.";
-    } else {
-      emailError.value = "";
-    }
-  };
 
-  // Validate password
-  const validatePassword = () => {
-    if (!password.value) {
-      passwordError.value = "Password is required.";
-    } else if (password.value.length < 6) {
-      passwordError.value = "Password must be at least 6 characters.";
-    } else {
+    if (field === "email" || !field) {
+      emailError.value = "";
+      if (!email.value) {
+        emailError.value = "Email is required.";
+      } else if (!emailPattern.test(email.value)) {
+        emailError.value = "Please enter a valid email address.";
+      }
+    }
+
+    if (field === "password" || !field) {
       passwordError.value = "";
+      if (!password.value) {
+        passwordError.value = "Password is required.";
+      }
     }
   };
 
   const login = async () => {
-    validateEmail();
-    validatePassword();
+    validateCredentials();
 
     if (emailError.value || passwordError.value) {
       return false;
@@ -48,16 +44,23 @@ export const useAuthStore = defineStore("auth", () => {
         password: password.value,
       });
 
-      // Adjust based on your API's actual response structure
       if (response.data.user && response.data.token) {
-        localStorage.setItem("authToken", response.data.token); 
+        localStorage.setItem("authToken", response.data.token);
         return true;
       } else {
-        loginError.value = "Invalid login credentials.";
+        loginError.value = response.data.message;
         return false;
       }
     } catch (error) {
-      loginError.value = "Login failed. Please try again";
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        loginError.value = error.response.data.message;
+      } else {
+        loginError.value = "Login failed. Please try again";
+      }
       return false;
     }
   };
@@ -68,8 +71,7 @@ export const useAuthStore = defineStore("auth", () => {
     emailError,
     passwordError,
     loginError,
-    validateEmail,
-    validatePassword,
+    validateCredentials,
     login,
   };
 });
