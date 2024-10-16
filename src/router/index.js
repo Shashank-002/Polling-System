@@ -9,7 +9,7 @@ const routes = [
   {
     path: "/poll-list",
     name: "PollPage",
-    component: () => import("../pages/PollPage.vue"),
+    component: () => import("../pages/PollListPage.vue"),
   },
 ];
 
