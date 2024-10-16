@@ -1,47 +1,21 @@
 // src/stores/useAuthStore.js
 import { defineStore } from "pinia";
-import { reactive, toRef } from "vue";
+import { toRef } from "vue";
 import { apiClient } from "./DetailApi";
+import { useValidation } from "../composables/useValidations";
 
 export const useAuthStore = defineStore("auth", () => {
-  // Create a reactive object to hold all authentication fields
-  const state = reactive({
-    email: "",
-    password: "",
-    emailError: "",
-    passwordError: "",
-    loginError: "",
-  });
-
-  const validateCredentials = (field) => {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (field === "email" || !field) {
-      state.emailError = "";
-      if (!state.email) {
-        state.emailError = "Email is required.";
-      } else if (!emailPattern.test(state.email)) {
-        state.emailError = "Please enter a valid email address.";
-      }
-    }
-
-    if (field === "password" || !field) {
-      state.passwordError = "";
-      if (!state.password) {
-        state.passwordError = "Password is required.";
-      }
-    }
-  };
+  const { state, validateCredentials } = useValidation();
 
   const login = async () => {
-    validateCredentials();
+    validateCredentials(); // Validate for login
 
     if (state.emailError || state.passwordError) {
       return false;
     }
 
     try {
-      const response = await apiClient.post("/", {
+      const response = await apiClient.post("/user/login", {
         email: state.email,
         password: state.password,
       });
@@ -50,7 +24,7 @@ export const useAuthStore = defineStore("auth", () => {
         localStorage.setItem("authToken", response.data.token);
         return true;
       } else {
-        state.loginError = response.data.message;
+        state.loginError = response.data.message || "Login failed.";
         return false;
       }
     } catch (error) {
@@ -61,7 +35,7 @@ export const useAuthStore = defineStore("auth", () => {
       ) {
         state.loginError = error.response.data.message;
       } else {
-        state.loginError = "Login failed. Please try again";
+        state.loginError = "Login failed. Please try again.";
       }
       return false;
     }
