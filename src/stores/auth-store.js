@@ -1,8 +1,8 @@
 // src/stores/useAuthStore.js
 import { defineStore } from "pinia";
 import { toRef } from "vue";
-import { apiClient } from "./DetailApi";
-import { useValidation } from "../composables/useValidations";
+import { apiClient } from "../composables/use-api-call";
+import { useValidation } from "../composables/login-signup";
 
 export const useAuthStore = defineStore("auth", () => {
   const { state, validateCredentials } = useValidation();
