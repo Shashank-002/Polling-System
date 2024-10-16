@@ -1,8 +1,9 @@
-// composables/useAuth.js
+// src/stores/useAuthStore.js
+import { defineStore } from "pinia";
 import { reactive, toRef } from "vue";
 import { apiClient } from "./DetailApi";
 
-export function useAuth() {
+export const useAuthStore = defineStore("auth", () => {
   // Create a reactive object to hold all authentication fields
   const state = reactive({
     email: "",
@@ -75,4 +76,4 @@ export function useAuth() {
     validateCredentials,
     login,
   };
-}
+});

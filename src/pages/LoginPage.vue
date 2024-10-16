@@ -9,19 +9,20 @@
                     <label class="block text-gray-600 text-left font-semibold mb-2" for="email">
                         Email Address
                     </label>
-                    <input type="email" id="email" v-model="email" @input="validateCredentials('email')"
-                        @keydown.enter.prevent
+                    <input type="email" id="email" v-model="authStore.email"
+                        @input="authStore.validateCredentials('email')" @keydown.enter.prevent
                         class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out"
                         placeholder="Email" />
-                    <p v-if="emailError" class="text-red-500 text-sm text-left mt-2">{{ emailError }}</p>
+                    <p v-if="authStore.emailError" class="text-red-500 text-sm text-left mt-2">{{ authStore.emailError
+                        }}</p>
                 </div>
 
                 <div class="mb-6 relative min-h-[110px]">
                     <label class="block text-gray-600 text-left font-semibold mb-2" for="password">
                         Password
                     </label>
-                    <input :type="showPassword ? 'text' : 'password'" id="password" v-model="password"
-                        @input="validateCredentials('password')" @keydown.enter.prevent
+                    <input :type="showPassword ? 'text' : 'password'" id="password" v-model="authStore.password"
+                        @input="authStore.validateCredentials('password')" @keydown.enter.prevent
                         class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out pr-10"
                         placeholder="Password" />
                     <button type="button" @click="togglePasswordVisibility"
@@ -30,7 +31,8 @@
                         <span v-if="showPassword"><font-awesome-icon :icon="['fas', 'eye']" /></span>
                         <span v-else><font-awesome-icon :icon="['fas', 'eye-slash']" /></span>
                     </button>
-                    <p v-if="passwordError" class="text-red-500 text-sm text-left mt-2">{{ passwordError }}</p>
+                    <p v-if="authStore.passwordError" class="text-red-500 text-sm text-left mt-2">{{
+                        authStore.passwordError }}</p>
                 </div>
 
                 <div class="flex items-center justify-center">
@@ -54,35 +56,35 @@
 </template>
 
 <script setup>
-import { useAuth } from '@/composables/LoginSignup';
+import { useAuthStore } from '@/composables/LoginSignup';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 
-const { email, password, emailError, passwordError, validateCredentials, login, loginError } = useAuth();
 const router = useRouter();
+const authStore = useAuthStore(); 
 const showPassword = ref(false);
 const loading = ref(false);
 
 const handleLogin = async () => {
     loading.value = true;
 
-    // Validate credentials and assign errors
-    validateCredentials('email');
-    validateCredentials('password');
+    // Validate credentials
+    authStore.validateCredentials('email');
+    authStore.validateCredentials('password');
 
-    if (emailError.value || passwordError.value) {
-        loading.value = false;
+    if (authStore.emailError || authStore.passwordError) {
+        loading.value = false; 
         return;
     }
 
-    const loginSuccess = await login();
-
-    // Check login success
+    const loginSuccess = await authStore.login();
     if (loginSuccess) {
+        // Redirect on successful login
         router.push("/poll-list");
     } else {
-        toast.error(loginError.value, {
+        // Show error message
+        toast.error(authStore.loginError, {
             theme: 'colored',
             position: toast.POSITION.BOTTOM_CENTER
         });
@@ -90,7 +92,6 @@ const handleLogin = async () => {
 
     loading.value = false;
 };
-
 
 const togglePasswordVisibility = () => {
     showPassword.value = !showPassword.value;
