@@ -1,66 +1,38 @@
-import { reactive } from "vue";
+import { ref } from "vue";
+import { useAuthStore } from "@/stores/auth-store";
 
-// Function to validate the email
-export const isValidEmail = (email) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-// Function to validate individual fields
-const validateField = (value, fieldName, formData, mode) => {
-  if (!value.trim()) {
-    return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required.`;
-  }
-  if (fieldName === "email" && !isValidEmail(value)) {
-    return "Please enter a valid email address.";
-  }
-  if (fieldName === "password" && mode === "signup" && value.length < 6) {
-    return "Password must be at least 6 characters.";
-  }
-  if (fieldName === "confirmPassword" && value !== formData.password) {
-    return "Passwords do not match.";
-  }
-  return "";
-};
-
-// Function to validate the entire form
-export const validateForm = (formData, mode) => {
-  const errors = {};
-  let isFormValid = true;
-
-  Object.keys(formData).forEach((key) => {
-    const errorData = validateField(formData[key], key, formData, mode);
-    errors[key] = errorData;
-    if (errorData) {
-      isFormValid = false;
-    }
-  });
-
-  return { errors, isFormValid };
-};
-
-// Main validation composable
+const authStore = useAuthStore();
 export const useValidation = () => {
-  const state = reactive({
+  const state = ref({
     email: "",
     password: "",
-    confirmPassword: "",
     emailError: "",
     passwordError: "",
-    confirmPasswordError: "",
   });
 
-  const validateCredentials = (mode) => {
-    // Reset errors before validation
-    state.emailError = "";
-    state.passwordError = "";
-    state.confirmPasswordError = "";
+  const validateCredentials = (field) => {
+    state.value.emailError = "";
+    state.value.passwordError = "";
 
-    const { errors, isFormValid } = validateForm(state, mode);
-    state.emailError = errors.email || "";
-    state.passwordError = errors.password || "";
+    if (field === "email" || field === undefined) {
+      if (!state.value.email) {
+        state.value.emailError = "Email is required";
+      } else if (!/\S+@\S+\.\S+/.test(state.value.email)) {
+        state.value.emailError = "Please enter a valid email address";
+      } else {
+        authStore.email = state.value.email;
+      }
+    }
 
-    return isFormValid;
+    if (field === "password" || field === undefined) {
+      if (!state.value.password) {
+        state.value.passwordError = "Password is required";
+      } else {
+        authStore.password = state.value.password;
+      }
+    }
+
+    return !state.value.emailError && !state.value.passwordError;
   };
 
   return {

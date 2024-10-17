@@ -1,30 +1,29 @@
 // src/stores/useAuthStore.js
 import { defineStore } from "pinia";
-import { toRef } from "vue";
+import { ref } from "vue";
 import { apiClient } from "../composables/use-api-call";
-import { useValidation } from "../composables/login-signup";
 
 export const useAuthStore = defineStore("auth", () => {
-  const { state, validateCredentials } = useValidation();
+  // Local state for email, password, and errors
+  const email = ref("");
+  const password = ref("");
+  const loginError = ref("");
 
+  // Login function to handle API call
   const login = async () => {
-    validateCredentials(); // Validate for login
-
-    if (state.emailError || state.passwordError) {
-      return false;
-    }
+    loginError.value = "";
 
     try {
       const response = await apiClient.post("/user/login", {
-        email: state.email,
-        password: state.password,
+        email: email.value,
+        password: password.value,
       });
 
       if (response.data.user && response.data.token) {
         localStorage.setItem("authToken", response.data.token);
         return true;
       } else {
-        state.loginError = response.data.message || "Login failed.";
+        loginError.value = response.data.message || "Login failed.";
         return false;
       }
     } catch (error) {
@@ -33,21 +32,18 @@ export const useAuthStore = defineStore("auth", () => {
         error.response.data &&
         error.response.data.message
       ) {
-        state.loginError = error.response.data.message;
+        loginError.value = error.response.data.message;
       } else {
-        state.loginError = "Login failed. Please try again.";
+        loginError.value = "Login failed. Please try again.";
       }
       return false;
     }
   };
 
   return {
-    email: toRef(state, "email"),
-    password: toRef(state, "password"),
-    emailError: toRef(state, "emailError"),
-    passwordError: toRef(state, "passwordError"),
-    loginError: toRef(state, "loginError"),
-    validateCredentials,
+    email,
+    password,
+    loginError,
     login,
   };
 });
