@@ -1,29 +1,31 @@
 // src/stores/useAuthStore.js
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { reactive, toRef } from "vue";
 import { apiClient } from "../composables/use-api-call";
 
 export const useAuthStore = defineStore("auth", () => {
-  // Local state for email, password, and errors
-  const email = ref("");
-  const password = ref("");
-  const loginError = ref("");
+  // Define state as a reactive object
+  const state = reactive({
+    email: "",
+    password: "",
+    loginError: "",
+  });
 
   // Login function to handle API call
   const login = async () => {
-    loginError.value = "";
+    state.loginError = "";
 
     try {
       const response = await apiClient.post("/user/login", {
-        email: email.value,
-        password: password.value,
+        email: state.email,
+        password: state.password,
       });
 
       if (response.data.user && response.data.token) {
         localStorage.setItem("authToken", response.data.token);
         return true;
       } else {
-        loginError.value = response.data.message || "Login failed.";
+        state.loginError = response.data.message || "Login failed.";
         return false;
       }
     } catch (error) {
@@ -32,18 +34,18 @@ export const useAuthStore = defineStore("auth", () => {
         error.response.data &&
         error.response.data.message
       ) {
-        loginError.value = error.response.data.message;
+        state.loginError = error.response.data.message;
       } else {
-        loginError.value = "Login failed. Please try again.";
+        state.loginError = "Login failed. Please try again.";
       }
       return false;
     }
   };
 
   return {
-    email,
-    password,
-    loginError,
+    email: toRef(state, "email"),
+    password: toRef(state, "password"),
+    loginError: toRef(state, "loginError"),
     login,
   };
 });

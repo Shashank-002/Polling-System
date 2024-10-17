@@ -2,6 +2,7 @@ import { ref } from "vue";
 import { useAuthStore } from "@/stores/auth-store";
 
 const authStore = useAuthStore();
+const emailRegex = /\S+@\S+\.\S+/;
 export const useValidation = () => {
   const state = ref({
     email: "",
@@ -17,7 +18,7 @@ export const useValidation = () => {
     if (field === "email" || field === undefined) {
       if (!state.value.email) {
         state.value.emailError = "Email is required";
-      } else if (!/\S+@\S+\.\S+/.test(state.value.email)) {
+      } else if (!emailRegex.test(state.value.email)) {
         state.value.emailError = "Please enter a valid email address";
       } else {
         authStore.email = state.value.email;
