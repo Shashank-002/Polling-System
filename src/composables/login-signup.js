@@ -1,43 +1,42 @@
-import { ref } from "vue";
 import { useAuthStore } from "@/stores/auth-store";
 
-const authStore = useAuthStore();
 const emailRegex = /\S+@\S+\.\S+/;
-export const useValidation = () => {
-  const state = ref({
-    email: "",
-    password: "",
-    emailError: "",
-    passwordError: "",
-  });
+
+export const useValidation = (formData, formErrors) => {
+  const authStore = useAuthStore();
 
   const validateCredentials = (field) => {
-    state.value.emailError = "";
-    state.value.passwordError = "";
-
+    // Validate email
     if (field === "email" || field === undefined) {
-      if (!state.value.email) {
-        state.value.emailError = "Email is required";
-      } else if (!emailRegex.test(state.value.email)) {
-        state.value.emailError = "Please enter a valid email address";
+      formErrors.emailError = ""; 
+
+      if (!formData.email) {
+        formErrors.emailError = "Email is required";
+      } else if (!emailRegex.test(formData.email)) {
+        formErrors.emailError = "Please enter a valid email address";
       } else {
-        authStore.email = state.value.email;
+        authStore.email = formData.email; 
+      }
+
+      if (!formErrors.emailError && formData.password) {
+        formErrors.passwordError = "";
       }
     }
 
+    // Validate password
     if (field === "password" || field === undefined) {
-      if (!state.value.password) {
-        state.value.passwordError = "Password is required";
+      formErrors.passwordError = ""; 
+      if (!formData.password) {
+        formErrors.passwordError = "Password is required";
       } else {
-        authStore.password = state.value.password;
+        authStore.password = formData.password;
       }
     }
 
-    return !state.value.emailError && !state.value.passwordError;
+    return !formErrors.emailError && !formErrors.passwordError;
   };
 
   return {
-    state,
     validateCredentials,
   };
 };

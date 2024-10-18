@@ -1,6 +1,7 @@
 <template>
   <div class="flex items-center justify-center">
     <div class="w-full max-w-md">
+      <!-- Login Form -->
       <form @submit.prevent="handleLogin" class="bg-white border border-slate-900 rounded-lg px-8 py-10 shadow-lg">
         <h2 class="text-center text-3xl font-extrabold mb-6">Login</h2>
 
@@ -9,11 +10,11 @@
           <label class="block text-gray-600 text-left font-semibold mb-2" for="email">
             Email Address
           </label>
-          <input type="email" id="email" v-model="state.email" @input="validateCredentials('email')"
+          <input type="email" id="email" v-model="formData.email" @input="validateCredentials('email')"
             @keydown.enter.prevent
             class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out"
             placeholder="Email" />
-          <p v-if="state.emailError" class="text-red-500 text-sm text-left mt-2">{{ state.emailError }}</p>
+          <p v-if="formErrors.emailError" class="text-red-500 text-sm text-left mt-2">{{ formErrors.emailError }}</p>
         </div>
 
         <!-- Password input -->
@@ -21,11 +22,12 @@
           <label class="block text-gray-600 text-left font-semibold mb-2" for="password">
             Password
           </label>
-          <PasswordToggle :password="state.password" @input="(event) => {
-            state.password = event;
+          <PasswordToggle :password="formData.password" @input="(event) => {
+            formData.password = event;
             validateCredentials('password');
           }" />
-          <p v-if="state.passwordError" class="text-red-500 text-sm text-left mt-2">{{ state.passwordError }}</p>
+          <p v-if="formErrors.passwordError" class="text-red-500 text-sm text-left mt-2">{{ formErrors.passwordError }}
+          </p>
         </div>
 
         <!-- Login button -->
@@ -35,6 +37,7 @@
           </BaseButton>
         </div>
 
+        <!-- Sign-up Link -->
         <p class="text-center text-gray-600 mt-6 text-sm">
           Don't have an account? <a href="#" class="text-blue-500 hover:underline">Sign Up</a>
         </p>
@@ -48,5 +51,6 @@ import { useLogin } from '@/composables/use-login';
 import PasswordToggle from '@/components/PasswordToggle.vue';
 import BaseButton from '@/components/BaseButton.vue';
 
-const { loading, handleLogin, state, validateCredentials } = useLogin();
+// Destructuring necessary functions and reactive variables from useLogin
+const { loading, handleLogin, formData, formErrors, validateCredentials } = useLogin();
 </script>
