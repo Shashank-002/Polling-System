@@ -10,7 +10,7 @@
           <label class="block text-gray-600 text-left font-semibold mb-2" for="email">
             Email Address
           </label>
-          <input type="email" id="email" v-model="formData.email" @input="validateCredentials('email')"
+          <input type="email" id="email" v-model="formData.email" @input="validateFieldError('email')"
             @keydown.enter.prevent
             class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out"
             placeholder="Email" />
@@ -24,7 +24,7 @@
           </label>
           <PasswordToggle :password="formData.password" @input="(event) => {
             formData.password = event;
-            validateCredentials('password');
+            validateFieldError('password');
           }" />
           <p v-if="formErrors.passwordError" class="text-red-500 text-sm text-left mt-2">{{ formErrors.passwordError }}
           </p>
@@ -50,5 +50,5 @@ import PasswordToggle from '@/components/PasswordToggle.vue';
 import BaseButton from '@/components/BaseButton.vue';
 
 // Destructure properties from useLogin
-const { loading, handleLogin, formData, formErrors, validateCredentials } = useLogin();
+const { loading, handleLogin, formData, formErrors, validateFieldError } = useLogin();
 </script>

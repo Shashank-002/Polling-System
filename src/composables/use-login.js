@@ -1,11 +1,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth-store";
-import {
-  isValidEmail,
-  isValidPassword,
-  validateField,
-} from "@/composables/validations";
+import { validateForm, validateField } from "@/composables/validations";
 import { toast } from "vue3-toastify";
 
 export const useLogin = () => {
@@ -24,45 +20,24 @@ export const useLogin = () => {
 
   const loading = ref(false);
 
-  const validateCredentials = () => {
-    let isValid = true;
-
-    // Reset errors
-    formErrors.value.emailError = "";
-    formErrors.value.passwordError = "";
-
-    // Validate email
-    const emailError = validateField(formData.value.email, "email");
-    if (emailError) {
-      formErrors.value.emailError = emailError;
-      isValid = false;
-    } else if (!isValidEmail(formData.value.email)) {
-      formErrors.value.emailError = "Please enter a valid email address.";
-      isValid = false;
-    }
-
-    // Validate password
-    const passwordError = validateField(formData.value.password, "password");
-    if (passwordError) {
-      formErrors.value.passwordError = passwordError;
-      isValid = false;
-    } else if (!isValidPassword(formData.value.password)) {
-      formErrors.value.passwordError = "Password is required.";
-      isValid = false;
-    }
-
-    return isValid;
-  };
-
+  // Function to handle form submission and validation
   const handleLogin = async () => {
     loading.value = true;
 
-    const isValid = validateCredentials();
-    if (!isValid) {
+    // Validate entire form
+    const { errors, isFormValid } = validateForm(formData.value);
+    formErrors.value = {
+      emailError: errors.email || "",
+      passwordError: errors.password || "",
+    };
+
+    // Stop the process if the form is invalid
+    if (!isFormValid) {
       loading.value = false;
       return;
     }
 
+    // Proceed with login if the form is valid
     const { email, password } = formData.value;
     const loginResponse = await authStore.login(email, password);
 
@@ -75,7 +50,13 @@ export const useLogin = () => {
       });
     }
 
-    loading.value = false; // Stop loading after response handling
+    loading.value = false;
+  };
+
+  // Function to validate a specific field dynamically
+  const validateFieldError = (field) => {
+    const error = validateField(formData.value[field], field);
+    formErrors.value[`${field}Error`] = error;
   };
 
   return {
@@ -83,6 +64,6 @@ export const useLogin = () => {
     handleLogin,
     formData,
     formErrors,
-    validateCredentials,
+    validateFieldError,
   };
 };
