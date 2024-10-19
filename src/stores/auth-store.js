@@ -1,32 +1,28 @@
 // src/stores/useAuthStore.js
 import { defineStore } from "pinia";
-import { reactive, toRef } from "vue";
+import { computed, ref } from "vue";
 import { apiClient } from "../composables/use-api-call";
-
 export const useAuthStore = defineStore("auth", () => {
-  // Define state as a reactive object
-  const state = reactive({
-    email: "",
-    password: "",
-    loginError: "",
-  });
+  const user = ref(null);
+  const authToken = ref(null);
 
-  // Login function to handle API call
-  const login = async () => {
-    state.loginError = "";
+  const login = async (email, password) => {
+    let loginError = "";
 
     try {
       const response = await apiClient.post("/user/login", {
-        email: state.email,
-        password: state.password,
+        email: email,
+        password: password,
       });
 
       if (response.data.user && response.data.token) {
+        authToken.value = response.data.token;
+        user.value = response.data.user;
         localStorage.setItem("authToken", response.data.token);
-        return true;
+        return { success: true };
       } else {
-        state.loginError = response.data.message || "Login failed.";
-        return false;
+        loginError = response.data.message || "Login failed.";
+        return { success: false, error: loginError };
       }
     } catch (error) {
       if (
@@ -34,18 +30,20 @@ export const useAuthStore = defineStore("auth", () => {
         error.response.data &&
         error.response.data.message
       ) {
-        state.loginError = error.response.data.message;
+        loginError = error.response.data.message;
       } else {
-        state.loginError = "Login failed. Please try again.";
+        loginError = "Login failed. Please try again.";
       }
-      return false;
+      return { success: false, error: loginError };
     }
   };
 
+  const isAuthenticated = computed(() => !!authToken.value);
+
   return {
-    email: toRef(state, "email"),
-    password: toRef(state, "password"),
-    loginError: toRef(state, "loginError"),
+    user,
+    authToken,
     login,
+    isAuthenticated,
   };
 });

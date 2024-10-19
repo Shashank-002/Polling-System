@@ -1,6 +1,6 @@
 <!-- src/components/PasswordToggle.vue -->
 <template>
-  <div class="relative ">
+  <div class="relative">
     <input :type="showPassword ? 'text' : 'password'" :value="password" @input="updatePassword" @keydown.enter.prevent
       class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out pr-10"
       placeholder="Password" />
@@ -16,6 +16,7 @@
 <script setup>
 import { ref, defineProps, defineEmits } from 'vue';
 
+// Define props
 defineProps({
   password: {
     type: String,
@@ -23,7 +24,7 @@ defineProps({
   }
 });
 
-const emit = defineEmits(['input']);
+const emitPasswordChange = defineEmits(['input']);
 const showPassword = ref(false);
 
 const togglePasswordVisibility = () => {
@@ -31,6 +32,6 @@ const togglePasswordVisibility = () => {
 };
 
 const updatePassword = (event) => {
-  emit('input', event.target.value);
+  emitPasswordChange('input', event.target.value);
 };
 </script>

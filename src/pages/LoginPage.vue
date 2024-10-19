@@ -32,9 +32,7 @@
 
         <!-- Login button -->
         <div class="flex items-center justify-center">
-          <BaseButton :isLoading="loading" @click="handleLogin">
-            Login
-          </BaseButton>
+          <BaseButton :isLoading="loading" :buttonText="'Login'" @click="handleLogin" />
         </div>
 
         <!-- Sign-up Link -->
@@ -51,6 +49,6 @@ import { useLogin } from '@/composables/use-login';
 import PasswordToggle from '@/components/PasswordToggle.vue';
 import BaseButton from '@/components/BaseButton.vue';
 
-// Destructuring necessary functions and reactive variables from useLogin
+// Destructure properties from useLogin
 const { loading, handleLogin, formData, formErrors, validateCredentials } = useLogin();
 </script>
