@@ -1,10 +1,10 @@
 import { createPinia } from "pinia";
 import { createApp } from "vue";
 import App from "./App.vue";
+import "./assets/tailwind.css";
 import router from "./router/index";
 import VueToastify from "vue-toastify";
-import "vue3-toastify/dist/index.css"; // Import Toastify CSS
-
+import "vue3-toastify/dist/index.css";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faEyeSlash } from "@fortawesome/free-solid-svg-icons";
