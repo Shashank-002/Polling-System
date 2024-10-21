@@ -1,4 +1,3 @@
-
 <template>
   <button type="button" :class="[
     'w-full h-12 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition ease-in-out duration-200',
