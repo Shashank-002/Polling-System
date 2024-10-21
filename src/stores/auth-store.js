@@ -1,6 +1,6 @@
 // src/stores/auth-store.js
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { apiClient } from "../composables/use-api-call";
 import { useRouter } from "vue-router";
 
@@ -14,9 +14,6 @@ export const useAuthStore = defineStore("auth", () => {
   if (storedUser) {
     user.value = JSON.parse(storedUser);
   }
-
-  // Computed property to check if the user is logged in
-  const isAuthenticated = computed(() => !!authToken.value || !!storedUser);
 
   const login = async (email, password) => {
     try {
@@ -59,6 +56,5 @@ export const useAuthStore = defineStore("auth", () => {
     authToken,
     login,
     logout,
-    isAuthenticated,
   };
 });

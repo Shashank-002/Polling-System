@@ -25,18 +25,20 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
 
-  // Check if the user is logged in
-  const { isAuthenticated } = authStore;
+  const authToken = localStorage.getItem("authToken");
 
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    // If the route requires authentication
-    if (!isAuthenticated) {
-      next({ name: "PollLoginPage" });
+    if (!authToken) {
+      authStore.logout();
     } else {
       next();
     }
   } else {
-    next();
+    if (to.name === "PollLoginPage" && authToken) {
+      next({ name: "PollPage" });
+    } else {
+      next();
+    }
   }
 });
 
