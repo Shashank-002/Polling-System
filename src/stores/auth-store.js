@@ -1,19 +1,17 @@
-// src/stores/auth-store.js
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, toRef } from "vue";
 import { apiClient } from "../composables/use-api-call";
 import { useRouter } from "vue-router";
 
 export const useAuthStore = defineStore("auth", () => {
-  const user = ref(null);
-  const router = useRouter();
-  const authToken = ref(localStorage.getItem("authToken"));
+  const state = {
+    user: ref(null),
+    authToken: ref(localStorage.getItem("authToken")),
+  };
 
-  // Check if there's user data in localStorage and initialize the user
-  const storedUser = localStorage.getItem("userData");
-  if (storedUser) {
-    user.value = JSON.parse(storedUser);
-  }
+  const router = useRouter();
+  const user = toRef(state, "user");
+  const authToken = toRef(state, "authToken");
 
   const login = async (email, password) => {
     try {

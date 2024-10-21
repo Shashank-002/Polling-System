@@ -34,7 +34,7 @@ router.beforeEach((to, from, next) => {
       next();
     }
   } else {
-    if (to.name === "PollLoginPage" && authToken) {
+    if (authToken) {
       next({ name: "PollPage" });
     } else {
       next();
