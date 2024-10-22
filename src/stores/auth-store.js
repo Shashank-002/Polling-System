@@ -13,6 +13,7 @@ export const useAuthStore = defineStore("auth", () => {
   const user = toRef(state, "user");
   const authToken = toRef(state, "authToken");
 
+  //  login api call
   const login = async (email, password) => {
     try {
       const response = await apiClient.post("/user/login", {
@@ -41,6 +42,53 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  //  signup api call
+  const signup = async ({ firstName, lastName, email, password, roleId }) => {
+    try {
+      const response = await apiClient.post("/user/register", {
+        firstName,
+        lastName,
+        email,
+        password,
+        roleId,
+      });
+
+      if (response.data.user && response.data.token) {
+        return {
+          success: true,
+          user: response.data.user,
+          token: response.data.token,
+        };
+      } else {
+        if (response.data.error) {
+          const fieldErrors = response.data.error;
+          return {
+            success: false,
+            error: fieldErrors,
+          };
+        }
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data || "Signup failed. Please try again.";
+
+      if (
+        typeof errorMessage === "string" &&
+        errorMessage.includes("Duplicate entry")
+      ) {
+        return {
+          success: false,
+          error: "The email you entered is already registered.",
+        };
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
+  };
+
   const logout = () => {
     authToken.value = null;
     user.value = null;
@@ -53,6 +101,7 @@ export const useAuthStore = defineStore("auth", () => {
     user,
     authToken,
     login,
+    signup,
     logout,
   };
 });

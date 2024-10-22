@@ -25,7 +25,7 @@ export const useLogin = () => {
     loading.value = true;
 
     // Validate entire form
-    const { errors, isFormValid } = validateForm(formData.value);
+    const { errors, isFormValid } = validateForm(formData.value, false);
     formErrors.value = {
       emailError: errors.email || "",
       passwordError: errors.password || "",
