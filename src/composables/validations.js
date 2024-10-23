@@ -9,6 +9,10 @@ export const isValidPassword = (password) => {
   return password.trim().length >= 8;
 };
 
+const isValidName = (name) => {
+  return name.trim().length >= 4;
+};
+
 export const validateField = (
   value,
   fieldName,
@@ -26,6 +30,15 @@ export const validateField = (
     return "Please enter a valid email address.";
   }
 
+  if (
+    (fieldName === "firstName" || fieldName === "lastName") &&
+    !isValidName(value)
+  ) {
+    return `${
+      fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
+    } must be at least 4 characters long.`;
+  }
+
   // Password validation, but only for signup
   if (fieldName === "password" && isSignup && !isValidPassword(value)) {
     return "Password must be at least 8 characters long.";
@@ -40,7 +53,7 @@ export const validateField = (
     return "Please select a role.";
   }
 
-  return ""; // No error
+  return ""; 
 };
 
 // Validate form fields (for use in other components)

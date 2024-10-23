@@ -1,11 +1,9 @@
 import { ref } from "vue";
-// import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth-store";
 import { validateForm, validateField } from "@/composables/validations";
 import { toast } from "vue3-toastify";
 
 export const useSignup = () => {
-  //   const router = useRouter();
   const authStore = useAuthStore();
 
   // Form data for signup fields
@@ -29,6 +27,7 @@ export const useSignup = () => {
   });
 
   const loading = ref(false);
+  const isModalOpen = ref(false);
 
   // Function to handle form submission and validation
   const handleSignup = async () => {
@@ -50,19 +49,23 @@ export const useSignup = () => {
       loading.value = false;
       return;
     }
-
     // Proceed with signup if the form is valid
-    const { firstName, lastName, email, password, roleId } = formData.value;
+    const { firstName, lastName, email, password, confirmPassword, roleId } =
+      formData.value;
     const signupResponse = await authStore.signup({
       firstName,
       lastName,
       email,
       password,
+      confirmPassword,
       roleId,
     });
 
+    console.log("Signup Response:", signupResponse);
+
     if (signupResponse.success) {
-      //   router.push("/");
+      isModalOpen.value = true;
+      console.log("User Data:", signupResponse.user);
     } else {
       toast.error(signupResponse.error, {
         theme: "colored",
@@ -90,5 +93,6 @@ export const useSignup = () => {
     formData,
     formErrors,
     validateFieldError,
+    isModalOpen,
   };
 };

@@ -7,11 +7,13 @@ export const useAuthStore = defineStore("auth", () => {
   const state = {
     user: ref(null),
     authToken: ref(localStorage.getItem("authToken")),
+    roles: ref([]),
   };
 
   const router = useRouter();
   const user = toRef(state, "user");
   const authToken = toRef(state, "authToken");
+  const roles = ref(state.roles);
 
   //  login api call
   const login = async (email, password) => {
@@ -43,21 +45,29 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   //  signup api call
-  const signup = async ({ firstName, lastName, email, password, roleId }) => {
+  const signup = async ({
+    firstName,
+    lastName,
+    email,
+    password,
+    confirmPassword,
+    roleId,
+  }) => {
     try {
       const response = await apiClient.post("/user/register", {
         firstName,
         lastName,
         email,
         password,
+        confirmPassword,
         roleId,
       });
+      console.log("Raw API Response:", response.data);
 
-      if (response.data.user && response.data.token) {
+      if (response.data) {
         return {
           success: true,
-          user: response.data.user,
-          token: response.data.token,
+          user: response.data,
         };
       } else {
         if (response.data.error) {
@@ -67,6 +77,10 @@ export const useAuthStore = defineStore("auth", () => {
             error: fieldErrors,
           };
         }
+        return {
+          success: false,
+          error: response.data.message || "Signup failed.",
+        };
       }
     } catch (error) {
       const errorMessage =
@@ -89,6 +103,16 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  // fetch roles
+  const fetchRoles = async () => {
+    try {
+      const response = await apiClient.get("/role/list");
+      roles.value = response.data || [];
+    } catch (error) {
+      console.error("Failed to fetch roles:", error);
+    }
+  };
+
   const logout = () => {
     authToken.value = null;
     user.value = null;
@@ -103,5 +127,6 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     signup,
     logout,
+    fetchRoles,
   };
 });
