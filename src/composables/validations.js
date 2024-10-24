@@ -25,9 +25,19 @@ export const validateField = (
   isSignup = false
 ) => {
   if (!value.trim()) {
-    return `${
-      fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
-    } is required.`;
+    let formattedFieldName =
+      fieldName === "roleId"
+        ? "Role"
+        : fieldName
+            .replace(/([a-z])([A-Z])/g, "$1 $2")
+            .replace(/\b\w/g, (char) => char.toUpperCase());
+
+    // Custom error message for roleId
+    if (fieldName === "roleId") {
+      return "Please select a role.";
+    }
+
+    return `${formattedFieldName} is required.`;
   }
 
   // Field-specific validation
@@ -51,11 +61,7 @@ export const validateField = (
 
   // Confirm password validation for signup
   if (fieldName === "confirmPassword" && value !== formData.password) {
-    return "Passwords do not match.";
-  }
-
-  if (fieldName === "role" && value === "") {
-    return "Please select a role.";
+    return "Password do not match.";
   }
 
   return "";
