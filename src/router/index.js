@@ -9,6 +9,11 @@ const routes = [
     component: () => import("../pages/LoginPage.vue"),
   },
   {
+    path: "/signup",
+    name: "SignupPage",
+    component: () => import("../pages/SignupPage.vue"),
+  },
+  {
     path: "/poll-list",
     name: "PollPage",
     component: () => import("../pages/PollListPage.vue"),

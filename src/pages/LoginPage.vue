@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-center">
+  <div class="flex items-center justify-center min-h-screen bg-gray-100">
     <div class="w-full max-w-md">
       <!-- Login Form -->
       <form @submit.prevent="handleLogin" class="bg-white border border-slate-900 rounded-lg px-8 py-10 shadow-lg">
@@ -37,7 +37,7 @@
 
         <!-- Sign-up Link -->
         <p class="text-center text-gray-600 mt-6 text-sm">
-          Don't have an account? <a href="#" class="text-blue-500 hover:underline">Sign Up</a>
+          Don't have an account? <RouterLink to="/signup"><span class="text-blue-500">Sign up</span></RouterLink>
         </p>
       </form>
     </div>
