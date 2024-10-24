@@ -39,17 +39,22 @@
                 <!-- Role -->
                 <div class="mb-4 relative">
                     <label class="block text-gray-700 font-semibold mb-2" for="role">Role</label>
-                    <select id="role" v-model="formData.roleId" @change="validateFieldError('roleId')"
-                        class="w-full border border-gray-300 rounded-md py-3 px-4 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        style="appearance: none;">
-                        <option value="" disabled>Select a role</option>
-                        <option v-for="role in authStore.roles" :key="role.id" :value="String(role.id)">
-                            {{ role.name }}
-                        </option>
-                    </select>
+                    <div class="relative">
+                        <select id="role" v-model="formData.roleId" @change="validateFieldError('roleId')"
+                            class="w-full border border-gray-300 rounded-md py-3 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                            style="appearance: none;">
+                            <option value="" disabled>Select a role</option>
+                            <option v-for="role in authStore.roles" :key="role.id" :value="String(role.id)">
+                                {{ role.name }}
+                            </option>
+                        </select>
+                        <i
+                            class="fa fa-caret-down absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"></i>
+                    </div>
 
                     <p v-if="formErrors.roleIdError" class="text-red-500 text-sm mt-1">{{ formErrors.roleIdError }}</p>
                 </div>
+
 
                 <!-- Password -->
                 <div class="mb-4">
