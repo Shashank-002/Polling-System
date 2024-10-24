@@ -13,7 +13,7 @@ export const useAuthStore = defineStore("auth", () => {
   const router = useRouter();
   const user = toRef(state, "user");
   const authToken = toRef(state, "authToken");
-  const roles = ref(state.roles);
+  const roles = toRef(state.roles);
 
   //  login api call
   const login = async (email, password) => {
@@ -62,7 +62,6 @@ export const useAuthStore = defineStore("auth", () => {
         confirmPassword,
         roleId,
       });
-      console.log("Raw API Response:", response.data);
 
       if (response.data) {
         return {
@@ -108,8 +107,14 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       const response = await apiClient.get("/role/list");
       roles.value = response.data || [];
+      if (roles.value.length === 0) {
+        console.log("No roles fetched from API.");
+      }
     } catch (error) {
-      console.error("Failed to fetch roles:", error);
+      console.error(
+        "Failed to fetch roles:",
+        error.response?.data || error.message
+      );
     }
   };
 
@@ -125,6 +130,7 @@ export const useAuthStore = defineStore("auth", () => {
     user,
     authToken,
     login,
+    roles,
     signup,
     logout,
     fetchRoles,

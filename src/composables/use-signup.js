@@ -76,7 +76,6 @@ export const useSignup = () => {
     loading.value = false;
   };
 
-  // Function to validate a specific field dynamically
   const validateFieldError = (field) => {
     const error = validateField(
       formData.value[field],

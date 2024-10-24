@@ -53,7 +53,7 @@ export const validateField = (
     return "Please select a role.";
   }
 
-  return ""; 
+  return "";
 };
 
 // Validate form fields (for use in other components)
