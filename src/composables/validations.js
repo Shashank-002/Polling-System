@@ -6,19 +6,10 @@ export const isValidEmail = (email) => {
 
 // Password validation
 export const isValidPassword = (password) => {
-  const lengthRegex = /.{8,}/;
-  const uppercaseRegex = /[A-Z]/;
-  const lowercaseRegex = /[a-z]/;
-  const digitRegex = /\d/;
-  const specialCharRegex = /[!@#$%^&*()_+={}[\]:;"'<>,.?~`]/;
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}[\]:;"'<>,.?~`]).{8,}$/;
 
-  return (
-    lengthRegex.test(password) &&
-    uppercaseRegex.test(password) &&
-    lowercaseRegex.test(password) &&
-    digitRegex.test(password) &&
-    specialCharRegex.test(password)
-  );
+  return passwordRegex.test(password);
 };
 
 // Name validation

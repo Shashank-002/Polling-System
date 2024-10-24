@@ -1,5 +1,5 @@
-import { defineStore } from "pinia";
-import { ref, toRef } from "vue";
+import { defineStore, storeToRefs } from "pinia";
+import { ref } from "vue";
 import { apiClient } from "../composables/use-api-call";
 import { useRouter } from "vue-router";
 
@@ -11,9 +11,8 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   const router = useRouter();
-  const user = toRef(state, "user");
-  const authToken = toRef(state, "authToken");
-  const roles = toRef(state.roles);
+
+  const { user, authToken, roles } = storeToRefs(state);
 
   //  login api call
   const login = async (email, password) => {

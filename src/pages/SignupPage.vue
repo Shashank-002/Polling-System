@@ -44,7 +44,7 @@
                             class="w-full border border-gray-300 rounded-md py-3 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                             style="appearance: none;">
                             <option value="" disabled>Select a role</option>
-                            <option v-for="role in authStore.roles" :key="role.id" :value="String(role.id)">
+                            <option v-for="role in roles" :key="role.id" :value="String(role.id)">
                                 {{ role.name }}
                             </option>
                         </select>
@@ -95,7 +95,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import PasswordToggle from '@/components/PasswordToggle.vue';
 import BaseButton from '@/components/BaseButton.vue';
 import { useSignup } from '@/composables/use-signup';
@@ -106,10 +106,11 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const authStore = useAuthStore();
 const { formData, formErrors, loading, handleSignup, validateFieldError, isModalOpen } = useSignup();
-
+const roles = ref([]);
 
 onMounted(async () => {
     await authStore.fetchRoles();
+    roles.value = authStore.roles;
 });
 
 

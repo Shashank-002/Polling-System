@@ -61,11 +61,8 @@ export const useSignup = () => {
       roleId,
     });
 
-    console.log("Signup Response:", signupResponse);
-
     if (signupResponse.success) {
       isModalOpen.value = true;
-      console.log("User Data:", signupResponse.user);
     } else {
       toast.error(signupResponse.error, {
         theme: "colored",
