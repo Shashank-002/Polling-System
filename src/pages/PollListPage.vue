@@ -1,5 +1,6 @@
 <template>
   <div class="flex items-center justify-center min-h-screen bg-gray-100">
+    <Navbar/>
     <div class="text-center">
       <h1 class="text-2xl uppercase font-bold">Poll Page</h1>
       <p class="text-red-500">No poll available! at the moment.</p>
@@ -14,6 +15,7 @@
 </template>
 
 <script setup>
+import Navbar from '@/components/PollNavbar.vue'
 import { useAuthStore } from "@/stores/auth-store";
 
 const authStore = useAuthStore();
