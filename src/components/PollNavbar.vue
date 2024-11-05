@@ -4,12 +4,15 @@
         <div class="hidden lg:flex space-x-4 text-white">
             <router-link to="/poll-list" active-class="bg-teal-500 text-white rounded-md shadow-lg px-4 py-2"
                 class="py-2">Polls</router-link>
-            <router-link to="/add-poll" active-class="bg-red-500 text-white rounded-md shadow-lg px-4 py-2"
-                v-if="isAdmin" class="py-2">Add Poll</router-link>
-            <router-link to="/create-user" active-class="bg-red-500 text-white rounded-md shadow-lg px-4 py-2"
-                v-if="isAdmin" class="py-2">Create User</router-link>
-            <router-link to="/list-user" active-class="bg-red-500 text-white rounded-md shadow-lg px-4 py-2"
-                v-if="isAdmin" class="py-2">List Users</router-link>
+
+            <template v-if="isAdmin">
+                <router-link to="/add-poll" active-class="bg-teal-500 text-white rounded-md shadow-lg px-4 py-2"
+                    class="py-2">Add Poll</router-link>
+                <router-link to="/create-user" active-class="bg-teal-500 text-white rounded-md shadow-lg px-4 py-2"
+                    class="py-2">Create User</router-link>
+                <router-link to="/list-user" active-class="bg-teal500 text-white rounded-md shadow-lg px-4 py-2"
+                    class="py-2">List Users</router-link>
+            </template>
         </div>
 
         <div class="lg:hidden">
@@ -19,22 +22,23 @@
             </button>
             <!-- Show "Polls" link directly for employees on small screens -->
             <router-link v-if="!isAdmin" to="/poll-list"
-                active-class="bg-red-500 text-white rounded-md shadow-lg px-4 py-2"
+                active-class="bg-teal-500 text-white rounded-md shadow-lg px-4 py-2"
                 class="text-white">Polls</router-link>
         </div>
 
         <!-- Hamburger Menu Drawer -->
         <div class="lg:hidden fixed top-20 left-0 h-full w-48 bg-[#10898d] text-white flex flex-col space-y-2 p-4 transition-transform duration-300 ease-in-out"
-            :class="{ 'translate-x-0': hamburgerOpen, '-translate-x-full': !hamburgerOpen }">
+            :class="{ 'translate-x-0': hamburgerOpen, '-translate-x-full': !hamburgerOpen }" v-if="isAdmin">
             <router-link to="/poll-list" active-class="bg-teal-500 text-white rounded-md shadow-lg px-4 py-2"
                 class="px-4">Polls</router-link>
-            <router-link to="/add-poll" v-if="isAdmin"
-                active-class="bg-red-500 text-white rounded-md shadow-lg px-4 py-2" class="px-4">Add Poll</router-link>
-            <router-link to="/create-user" v-if="isAdmin"
-                active-class="bg-red-500 text-white rounded-md shadow-lg px-4 py-2" class="px-4">Create
+            <router-link to="/add-poll" active-class="bg-teal-500 text-white rounded-md shadow-lg px-4 py-2"
+                class="px-4">Add
+                Poll</router-link>
+            <router-link to="/create-user" active-class="bg-teal-500 text-white rounded-md shadow-lg px-4 py-2"
+                class="px-4">Create
                 User</router-link>
-            <router-link to="/list-user" v-if="isAdmin"
-                active-class="bg-red-500 text-white rounded-md shadow-lg px-4 py-2" class="px-4">List
+            <router-link to="/list-user" active-class="bg-teal-500 text-white rounded-md shadow-lg px-4 py-2"
+                class="px-4">List
                 Users</router-link>
         </div>
 
