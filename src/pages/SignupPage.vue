@@ -1,6 +1,6 @@
 <template>
     <div class="flex items-center justify-center min-h-screen bg-gray-100">
-        <div class="w-full max-w-lg bg-white border border-gray-300 rounded-lg shadow-lg p-8 my-10">
+        <div class="w-11/12 max-w-lg bg-white border border-gray-300 rounded-lg shadow-lg p-8 my-10">
             <h2 class="text-3xl font-extrabold text-center mb-8">Sign Up</h2>
             <form @submit.prevent="handleSignup">
                 <!-- First Name -->

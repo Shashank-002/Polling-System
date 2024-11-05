@@ -1,8 +1,8 @@
 <template>
   <div class="flex items-center justify-center min-h-screen bg-gray-100">
-    <div class="w-full max-w-md">
+    <div class="w-11/12  max-w-md ">
       <!-- Login Form -->
-      <form @submit.prevent="handleLogin" class="bg-white border border-slate-900 rounded-lg px-8 py-10 shadow-lg">
+      <form @submit.prevent="handleLogin" class="bg-white border border-slate-900 rounded-lg px-8 py-10 shadow-lg ">
         <h2 class="text-center text-3xl font-extrabold mb-6">Login</h2>
 
         <!-- Email input -->

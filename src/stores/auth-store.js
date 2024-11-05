@@ -14,6 +14,13 @@ export const useAuthStore = defineStore("auth", () => {
 
   const { user, authToken, roles } = storeToRefs(state);
 
+  const loadUserData = () => {
+    const storedUser = localStorage.getItem("userData");
+    if (storedUser) {
+      user.value = JSON.parse(storedUser);
+    }
+  };
+
   //  login api call
   const login = async (email, password) => {
     try {
@@ -133,5 +140,6 @@ export const useAuthStore = defineStore("auth", () => {
     signup,
     logout,
     fetchRoles,
+    loadUserData,
   };
 });
