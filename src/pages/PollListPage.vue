@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Navbar />
     <div class="flex items-center justify-center min-h-screen bg-gray-100">
       <div class="text-center">
         <h1 class="text-2xl uppercase font-bold">Poll Page</h1>
