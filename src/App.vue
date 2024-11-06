@@ -1,18 +1,18 @@
 <template>
   <div id="app">
-    <Navbar v-if="showNavbar" />
+    <Navbar v-if="isUserLoggedIn" />
     <router-view></router-view>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth-store'
 import Navbar from '@/components/PollNavbar.vue'
 
-const route = useRoute()
-const showNavbar = computed(() => {
-  const noNavbarRoutes = ['PollLoginPage', 'SignupPage']
-  return !noNavbarRoutes.includes(route.name)
+const authStore = useAuthStore()
+
+const isUserLoggedIn = computed(() => {
+  return authStore.user !== null && authStore.user !== ''
 })
 </script>
