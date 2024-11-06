@@ -1,0 +1,7 @@
+[
+    { "label": "Polls", "to": "/poll-list", "roles": ["admin", "user"] },
+    { "label": "Add Poll", "to": "/add-poll", "roles": ["admin"] },
+    { "label": "Create User", "to": "/create-user", "roles": ["admin"] },
+    { "label": "List Users", "to": "/list-user", "roles": ["admin"] }
+  ]
+  

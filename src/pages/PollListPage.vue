@@ -13,3 +13,4 @@
 <script setup>
 import Navbar from '@/components/PollNavbar.vue'
 </script>
+
