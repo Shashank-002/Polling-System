@@ -13,6 +13,6 @@ import Navbar from '@/components/PollNavbar.vue'
 const authStore = useAuthStore()
 
 const isUserLoggedIn = computed(() => {
-  return authStore.user !== null && authStore.user !== ''
+  return authStore.user;
 })
 </script>
