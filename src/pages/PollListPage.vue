@@ -11,14 +11,23 @@
         <h2 class="text-lg font-semibold text-gray-800 mb-4">{{ poll.title }}</h2>
         <ul class="mt-2 space-y-3">
           <li v-for="option in poll.options" :key="option.id" class="flex items-center">
-            <input type="radio" :name="'poll_' + poll.id" :value="option.optionTitle"
-              class="h-4 w-4 text-blue-600 focus:ring-0" :disabled="hasVoted(poll.id)"
-              @change="selectedOptions[poll.id] = option.id" />
-            <label class="ml-2 text-gray-700 text-sm">{{ option.optionTitle }}</label>
+            <input type="radio" :name="'poll_' + poll.id" :value="option.optionTitle" class="h-4 w-4 focus:ring-0"
+              :disabled="hasVoted(poll.id) || voting[poll.id]" :checked="selectedOptions[poll.id] === option.id"
+              @change="selectedOptions[poll.id] = option.id"
+              :class="{ 'bg-blue-600': selectedOptions[poll.id] === option.id }" />
+            <!-- Apply background to radio button -->
+
+            <label class="ml-2 text-gray-700 text-sm">
+              {{ option.optionTitle }}
+            </label>
           </li>
         </ul>
-        <button @click="submitVote(poll.id)" :disabled="hasVoted(poll.id) || !selectedOptions[poll.id]"
-          class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <button @click="submitVote(poll.id)"
+          :disabled="hasVoted(poll.id) || !selectedOptions[poll.id] || voting[poll.id]" :class="{
+            'bg-blue-600 hover:bg-blue-700': !hasVoted(poll.id) && !voting[poll.id],
+            'bg-gray-400 cursor-not-allowed': hasVoted(poll.id) || voting[poll.id]
+          }"
+          class="mt-4 w-full text-white font-semibold py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
           {{ hasVoted(poll.id) ? "Voted" : "Vote" }}
         </button>
       </div>
@@ -38,20 +47,34 @@ const { polls, error, fetchPolls, voteForOption, hasVoted } = pollsStore;
 
 const loading = ref(true);
 const selectedOptions = ref({});
+const voting = ref({}); // Tracks voting state for each poll
 
 const submitVote = async (pollId) => {
   const optionId = selectedOptions.value[pollId];
   if (!optionId) return;
 
+  voting.value[pollId] = true; // Immediately disable vote button and options
+
   try {
     await voteForOption(pollId, optionId);
-    alert("Vote created successfully");
+
+    // Store the selected option in localStorage to persist after refresh
+    const votedOptions = JSON.parse(localStorage.getItem("votedOptions")) || {};
+    votedOptions[pollId] = optionId;
+    localStorage.setItem("votedOptions", JSON.stringify(votedOptions));
+
   } catch (error) {
     alert(error.message);
+  } finally {
+    voting.value[pollId] = false; // Reset voting state after API call
   }
 };
 
-onMounted(async () => {
+onMounted(() => {
+  // Load previously selected options from localStorage
+  const votedOptions = JSON.parse(localStorage.getItem("votedOptions")) || {};
+  selectedOptions.value = { ...votedOptions };
+
   setTimeout(async () => {
     await fetchPolls();
     loading.value = false;

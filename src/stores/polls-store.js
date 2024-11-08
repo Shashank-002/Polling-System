@@ -13,9 +13,7 @@ export const usePollsStore = defineStore("polls", () => {
     error.value = null;
     try {
       const response = await apiClient.get("/poll/list/1?limit=10");
-      console.log("response", response);
 
-      // Store the polls data in localStorage (including options)
       const storedPolls = response.data.rows.map((poll) => ({
         id: poll.id,
         title: poll.title,
@@ -61,7 +59,7 @@ export const usePollsStore = defineStore("polls", () => {
 
     try {
       await apiClient.post("/vote/count", { pollId, optionId });
-      recordVote(pollId); // Mark this poll as voted for the user
+      recordVote(pollId);
       return "Vote created successfully";
     } catch (err) {
       throw new Error(err.response?.data?.message || "Failed to cast vote.");
