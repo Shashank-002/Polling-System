@@ -19,6 +19,10 @@ const routes = [
     component: () => import("../pages/PollListPage.vue"),
     meta: { requiresAuth: true },
   },
+  { path: '/edit-poll/:id',
+    name: 'editPollPage',
+    component: ()=> import("../pages/PollEditPage.vue"), 
+   }
 ];
 
 const router = createRouter({
@@ -38,12 +42,10 @@ router.beforeEach((to, from, next) => {
     } else {
       next();
     }
+  } else if (authToken && (to.name === "PollLoginPage" || to.name === "SignupPage")) {
+    next({ name: "PollPage" });  // Redirect authenticated users away from login/signup
   } else {
-    if (authToken) {
-      next({ name: "PollPage" });
-    } else {
-      next();
-    }
+    next();  // Proceed as normal
   }
 });
 
