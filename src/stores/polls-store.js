@@ -90,12 +90,22 @@ export const usePollsStore = defineStore("polls", () => {
   // delete poll api call
   const deletePoll = async (pollId) => {
     try {
+      // Ensure polls.value is an array before proceeding
+      if (!Array.isArray(polls.value)) {
+        console.error("polls.value is not an array. Re-initializing as an empty array.");
+        polls.value = []; // Re-initialize if not an array
+      }
+  
+      // Proceed with filtering the poll to delete it
+      polls.value = polls.value.filter(poll => poll.id !== pollId);
+  
+      // API call to delete poll
       await apiClient.delete(`/poll/${pollId}`);
-      polls.value = polls.value.filter(poll => poll.id !== pollId); 
     } catch (err) {
       throw new Error(err.response?.data?.message || "Failed to delete poll.");
     }
   };
+  
 
   return {
     polls,

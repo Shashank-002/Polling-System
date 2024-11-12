@@ -17,7 +17,7 @@
               <i class="fas fa-edit"></i>
             </router-link>
           </button>
-          <button class="text-green-500">
+          <button class="text-green-500 " @click="showChartModal(poll)">
             <i class="fas fa-bar-chart"></i>
           </button>
         </div>
@@ -43,6 +43,7 @@
         </button>
       </div>
     </div>
+    <BarChartModal v-if="showChart" :poll="selectedPoll" @close="closeChartModal" />
     <DeleteModal v-if="deleteModalVisible" @delete="confirmDelete" @cancel="deleteModalVisible = false" />
     <p v-if="!loading && polls.length === 0 && !error" class="text-red-500 mt-4">
       No poll available at the moment.
@@ -55,6 +56,7 @@ import { usePollsStore } from "../stores/polls-store";
 import { onMounted, ref, computed } from "vue";
 import { useAuthStore } from "../stores/auth-store";
 import DeleteModal from '../components/DeleteModal.vue'
+import BarChartModal from '../components/BarChartModal.vue'
 import { ADMIN_ROLE_ID } from '../composables/constants'
 
 const pollsStore = usePollsStore();
@@ -64,6 +66,8 @@ const { polls, error, fetchPolls, voteForOption, hasVoted, deletePoll } = pollsS
 const loading = ref(true);
 const selectedOptions = ref({});
 const voting = ref({});
+const showChart = ref(false);
+const selectedPoll = ref(null);
 const deleteModalVisible = ref(false);
 const pollIdToDelete = ref(null);
 
@@ -104,10 +108,21 @@ const confirmDelete = async () => {
     await deletePoll(pollIdToDelete.value);
     deleteModalVisible.value = false;
     pollIdToDelete.value = null;
-    await fetchPolls(); // Refresh poll list after deletion
+    await fetchPolls();
   } catch (error) {
     console.error("Failed to delete poll:", error);
   }
+};
+
+const showChartModal = (poll) => {
+  selectedPoll.value = poll;
+  showChart.value = true;
+};
+
+// Close bar chart modal
+const closeChartModal = () => {
+  showChart.value = false;
+  selectedPoll.value = null;
 };
 
 onMounted(async () => {
