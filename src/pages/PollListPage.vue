@@ -23,11 +23,11 @@
         </div>
         <h2 class="text-lg font-semibold text-gray-800 mb-4">{{ poll.title }}</h2>
         <ul class="mt-2 space-y-3 flex-1">
-          <li v-for="option in poll.options" :key="option.id" class="flex items-center">
-            <input type="radio" :name="'poll_' + poll.id" :value="option.optionTitle" class="h-4 w-4 focus:ring-0"
-              :disabled="hasVoted(poll.id, userId) || voting[poll.id]" :checked="selectedOptions[poll.id] === option.id"
-              @change="selectedOptions[poll.id] = option.id"
-              :class="{ 'bg-blue-600': selectedOptions[poll.id] === option.id }" />
+          <li v-for="option in poll.options" :key="option.id" class="flex items-center ">
+            <input type="radio" :name="'poll_' + poll.id" :value="option.optionTitle"
+              class="h-4 w-4 focus:ring-0  cursor-pointer" :disabled="hasVoted(poll.id, userId) || voting[poll.id]"
+              :checked="selectedOptions[poll.id] === option.id" @change="selectedOptions[poll.id] = option.id"
+              :class="{ 'bg-blue-600 ': selectedOptions[poll.id] === option.id }" />
             <label class="ml-2 text-gray-700 text-sm">
               {{ option.optionTitle }}
             </label>
@@ -35,7 +35,7 @@
         </ul>
         <button @click="submitVote(poll.id)"
           :disabled="hasVoted(poll.id, userId) || !selectedOptions[poll.id] || voting[poll.id]" :class="{
-            'bg-blue-600 hover:bg-blue-700': !hasVoted(poll.id, userId) && !voting[poll.id],
+            'bg-blue-600 hover:bg-blue-700 cursor-pointer': !hasVoted(poll.id, userId) && !voting[poll.id],
             'bg-gray-400 cursor-not-allowed': hasVoted(poll.id, userId) || voting[poll.id]
           }"
           class="mt-4 w-full text-white font-semibold py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
