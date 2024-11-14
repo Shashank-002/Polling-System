@@ -7,12 +7,15 @@ export const usePollsStore = defineStore("polls", () => {
   const polls = ref([]);
   const loading = ref(false);
   const error = ref(null);
+  const hasMorePolls = ref(true);
+  const page = ref(1); // Track the current page for pagination
 
-  // Fetch poll list from the API with a limit of 10
+  // Fetch poll list from the API with pagination and a limit of 10
   const fetchPolls = async () => {
     const authStore = useAuthStore(); // Access auth store
-    const loggedInUser = authStore.user.value || JSON.parse(localStorage.getItem("userData"));
-    
+    const loggedInUser =
+      authStore.user.value || JSON.parse(localStorage.getItem("userData"));
+
     if (!loggedInUser) {
       error.value = "User not logged in.";
       return;
@@ -23,19 +26,27 @@ export const usePollsStore = defineStore("polls", () => {
     error.value = null;
 
     try {
-      const response = await apiClient.get("/poll/list/1?limit=10");
-      
-      const storedPolls = response.data.rows.map((poll) => ({
+      const response = await apiClient.get(`/poll/list/${page.value}?limit=10`);
+      const fetchedPolls = response.data.rows.map((poll) => ({
         id: poll.id,
         title: poll.title,
         options: poll.optionList || [], // Ensure options are stored properly
       }));
-      
-      localStorage.setItem("polls", JSON.stringify(storedPolls));
-      polls.value = storedPolls.filter(poll => {
-        const votedPolls = getVotedPolls(userId); // Retrieve voted polls for the current user
-        return !votedPolls[poll.id]; // Show only fresh polls if not voted
-      });
+
+      if (fetchedPolls.length < 10) {
+        hasMorePolls.value = false; // No more polls if fetched less than limit
+      }
+
+      // Update local polls
+      polls.value = [
+        ...polls.value,
+        ...fetchedPolls.filter((poll) => {
+          const votedPolls = getVotedPolls(userId); // Retrieve voted polls for the current user
+          return !votedPolls[poll.id]; // Show only fresh polls if not voted
+        }),
+      ];
+
+      page.value += 1; // Increment page for next load
     } catch (err) {
       error.value = err.response?.data?.message || "Failed to fetch polls.";
       console.error("Error fetching polls:", error.value);
@@ -66,12 +77,12 @@ export const usePollsStore = defineStore("polls", () => {
     const votedPolls = getVotedPolls(userId);
     return !!votedPolls[pollId]; // Return true if the user has voted for this poll
   };
-  
 
   // Function to handle voting for a poll option
   const voteForOption = async (pollId, optionId) => {
     const authStore = useAuthStore();
-    const loggedInUser = authStore.user.value || JSON.parse(localStorage.getItem("userData"));
+    const loggedInUser =
+      authStore.user.value || JSON.parse(localStorage.getItem("userData"));
     const userId = loggedInUser ? loggedInUser.id : null;
 
     if (hasVoted(pollId, userId)) {
@@ -90,22 +101,12 @@ export const usePollsStore = defineStore("polls", () => {
   // delete poll api call
   const deletePoll = async (pollId) => {
     try {
-      // Ensure polls.value is an array before proceeding
-      if (!Array.isArray(polls.value)) {
-        console.error("polls.value is not an array. Re-initializing as an empty array.");
-        polls.value = []; // Re-initialize if not an array
-      }
-  
-      // Proceed with filtering the poll to delete it
-      polls.value = polls.value.filter(poll => poll.id !== pollId);
-  
-      // API call to delete poll
+      polls.value = polls.value.filter((poll) => poll.id !== pollId);
       await apiClient.delete(`/poll/${pollId}`);
     } catch (err) {
       throw new Error(err.response?.data?.message || "Failed to delete poll.");
     }
   };
-  
 
   return {
     polls,
@@ -115,5 +116,6 @@ export const usePollsStore = defineStore("polls", () => {
     voteForOption,
     hasVoted,
     deletePoll,
+    hasMorePolls,
   };
 });

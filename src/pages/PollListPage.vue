@@ -43,6 +43,10 @@
         </button>
       </div>
     </div>
+    <button @click="loadMorePolls" v-if="!loading && hasMorePolls"
+      class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg mb-8">
+      Load More
+    </button>
     <BarChartModal v-if="showChart" :poll="selectedPoll" @close="closeChartModal" />
     <DeleteModal v-if="deleteModalVisible" @delete="confirmDelete" @cancel="deleteModalVisible = false" />
     <p v-if="!loading && polls.length === 0 && !error" class="text-red-500 mt-4">
@@ -52,8 +56,8 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from 'vue';
 import { usePollsStore } from "../stores/polls-store";
-import { onMounted, ref, computed } from "vue";
 import { useAuthStore } from "../stores/auth-store";
 import DeleteModal from '../components/DeleteModal.vue'
 import BarChartModal from '../components/BarChartModal.vue'
@@ -61,7 +65,7 @@ import { ADMIN_ROLE_ID } from '../composables/constants'
 
 const pollsStore = usePollsStore();
 const authStore = useAuthStore();
-const { polls, error, fetchPolls, voteForOption, hasVoted, deletePoll } = pollsStore;
+const { polls, error, fetchPolls, voteForOption, hasVoted, deletePoll, hasMorePolls } = pollsStore;
 
 const loading = ref(true);
 const selectedOptions = ref({});
@@ -70,6 +74,7 @@ const showChart = ref(false);
 const selectedPoll = ref(null);
 const deleteModalVisible = ref(false);
 const pollIdToDelete = ref(null);
+const currentPage = ref(1);
 
 const loggedInUser = authStore.user.value || JSON.parse(localStorage.getItem("userData"));
 const userId = loggedInUser ? loggedInUser.id : null;
@@ -123,7 +128,16 @@ const showChartModal = (poll) => {
 const closeChartModal = () => {
   showChart.value = false;
   selectedPoll.value = null;
+
 };
+
+const loadMorePolls = async () => {
+  if (!loading.value && hasMorePolls) { // Directly use hasMorePolls (since it's not a ref)
+    currentPage.value++;
+    await fetchPolls(currentPage.value);
+  }
+};
+
 
 onMounted(async () => {
   const votedOptions = JSON.parse(localStorage.getItem(`votedOptions_${userId}`)) || {};
