@@ -18,7 +18,7 @@
             </router-link>
           </button>
           <button class="text-green-500 " @click="showChartModal(poll)">
-            <i class="fas fa-bar-chart"></i>
+            <i class="fa fa-bar-chart"></i>
           </button>
         </div>
         <h2 class="text-lg font-semibold text-gray-800 mb-4">{{ poll.title }}</h2>
@@ -43,7 +43,7 @@
         </button>
       </div>
     </div>
-    <button @click="loadMorePolls" v-if="!loading && hasMorePolls"
+    <button v-if="hasMorePolls && !loading" @click="loadMorePolls"
       class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg mb-8">
       Load More
     </button>
@@ -74,7 +74,6 @@ const showChart = ref(false);
 const selectedPoll = ref(null);
 const deleteModalVisible = ref(false);
 const pollIdToDelete = ref(null);
-const currentPage = ref(1);
 
 const loggedInUser = authStore.user.value || JSON.parse(localStorage.getItem("userData"));
 const userId = loggedInUser ? loggedInUser.id : null;
@@ -113,7 +112,6 @@ const confirmDelete = async () => {
     await deletePoll(pollIdToDelete.value);
     deleteModalVisible.value = false;
     pollIdToDelete.value = null;
-    await fetchPolls();
   } catch (error) {
     console.error("Failed to delete poll:", error);
   }
@@ -132,20 +130,20 @@ const closeChartModal = () => {
 };
 
 const loadMorePolls = async () => {
-  if (!loading.value && hasMorePolls) { // Directly use hasMorePolls (since it's not a ref)
-    currentPage.value++;
-    await fetchPolls(currentPage.value);
-  }
+  loading.value = true;
+  await fetchPolls();
+  loading.value = false;
 };
 
 
 onMounted(async () => {
+  polls.value = [];
   const votedOptions = JSON.parse(localStorage.getItem(`votedOptions_${userId}`)) || {};
   selectedOptions.value = { ...votedOptions };
 
   setTimeout(async () => {
     await fetchPolls();
     loading.value = false;
-  }, 500);
+  }, 1000);
 });
 </script>

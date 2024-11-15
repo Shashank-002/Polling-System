@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { apiClient } from "../composables/use-api-call";
 import { useAuthStore } from "./auth-store"; // Import auth store
+import { ADMIN_ROLE_ID } from "../composables/constants";
 
 export const usePollsStore = defineStore("polls", () => {
   const polls = ref([]);
@@ -10,46 +11,51 @@ export const usePollsStore = defineStore("polls", () => {
   const hasMorePolls = ref(true);
   const page = ref(1); // Track the current page for pagination
 
-  // Fetch poll list from the API with pagination and a limit of 10
   const fetchPolls = async () => {
-    const authStore = useAuthStore(); // Access auth store
-    const loggedInUser =
-      authStore.user.value || JSON.parse(localStorage.getItem("userData"));
-
-    if (!loggedInUser) {
-      error.value = "User not logged in.";
-      return;
-    }
-
-    const userId = loggedInUser.id;
     loading.value = true;
     error.value = null;
 
     try {
-      const response = await apiClient.get(`/poll/list/${page.value}?limit=10`);
-      const fetchedPolls = response.data.rows.map((poll) => ({
-        id: poll.id,
-        title: poll.title,
-        options: poll.optionList || [], // Ensure options are stored properly
-      }));
+      const authStore = useAuthStore();
+      const loggedInUser =
+        authStore.user.value || JSON.parse(localStorage.getItem("userData"));
+      const userId = loggedInUser ? loggedInUser.id : null;
+      const isAdmin = loggedInUser?.roleId === ADMIN_ROLE_ID;
 
-      if (fetchedPolls.length < 10) {
-        hasMorePolls.value = false; // No more polls if fetched less than limit
+      let fetchedPolls = [];
+      while (fetchedPolls.length < 10 && hasMorePolls.value) {
+        const response = await apiClient.get(
+          `/poll/list/${page.value}?limit=10`
+        );
+        const pollsFromServer = response.data.rows.map((poll) => ({
+          id: poll.id,
+          title: poll.title,
+          options: poll.optionList || [],
+        }));
+
+        fetchedPolls.push(
+          ...pollsFromServer.filter((poll) => {
+            const votedPolls = getVotedPolls(userId);
+            return isAdmin || !votedPolls[poll.id]; // Admin sees all; user sees non-voted
+          })
+        );
+
+        if (pollsFromServer.length < 10) {
+          hasMorePolls.value = false;
+          break;
+        }
+
+        page.value += 1;
       }
 
-      // Update local polls
-      polls.value = [
-        ...polls.value,
-        ...fetchedPolls.filter((poll) => {
-          const votedPolls = getVotedPolls(userId); // Retrieve voted polls for the current user
-          return !votedPolls[poll.id]; // Show only fresh polls if not voted
-        }),
-      ];
-
-      page.value += 1; // Increment page for next load
+      const fetchedPollIds = new Set();
+      polls.value.push(
+        ...fetchedPolls.filter(
+          (poll) => !fetchedPollIds.has(poll.id) && fetchedPollIds.add(poll.id)
+        )
+      ); // for unique poll and save from duplicate.
     } catch (err) {
       error.value = err.response?.data?.message || "Failed to fetch polls.";
-      console.error("Error fetching polls:", error.value);
     } finally {
       loading.value = false;
     }
@@ -101,11 +107,21 @@ export const usePollsStore = defineStore("polls", () => {
   // delete poll api call
   const deletePoll = async (pollId) => {
     try {
-      polls.value = polls.value.filter((poll) => poll.id !== pollId);
+      // polls.value = polls.value.filter((poll) => poll.id !== pollId);
+      const pollIndex = polls.value.findIndex((poll) => poll.id === pollId);
+      if (pollIndex !== -1) {
+        polls.value.splice(pollIndex, 1); // Remove the poll at the found index
+      }
       await apiClient.delete(`/poll/${pollId}`);
     } catch (err) {
       throw new Error(err.response?.data?.message || "Failed to delete poll.");
     }
+  };
+
+  const resetPolls = () => {
+    polls.value = [];
+    page.value = 1;
+    hasMorePolls.value = true;
   };
 
   return {
@@ -117,5 +133,6 @@ export const usePollsStore = defineStore("polls", () => {
     hasVoted,
     deletePoll,
     hasMorePolls,
+    resetPolls,
   };
 });
