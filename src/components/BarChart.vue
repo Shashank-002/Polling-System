@@ -18,29 +18,14 @@ const props = defineProps({
 const barChartCanvas = ref(null);
 let chartInstance = null;
 
-// Function to calculate vote counts from localStorage
+// Function to calculate vote counts from the options field
 const getVoteCounts = (poll) => {
     const voteCounts = {};
 
     // Initialize vote counts for each option
     poll.options.forEach(option => {
-        voteCounts[option.id] = 0;
+        voteCounts[option.id] = option.voteCount.length; 
     });
-
-    // Retrieve all users' votes from localStorage
-    for (const key in localStorage) {
-        if (key.startsWith("votedOptions_")) {
-            const userVotes = JSON.parse(localStorage.getItem(key));
-
-            // Check if the user has voted on the current poll
-            if (userVotes && userVotes[poll.id]) {
-                const optionId = userVotes[poll.id];
-                if (voteCounts[optionId] !== undefined) {
-                    voteCounts[optionId]++;
-                }
-            }
-        }
-    }
 
     return voteCounts;
 };

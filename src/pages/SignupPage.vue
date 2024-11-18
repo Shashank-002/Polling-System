@@ -88,8 +88,8 @@
                     Already registered? <RouterLink to="/"><span class="text-blue-500">Sign in</span></RouterLink>
                 </p>
             </form>
-            <SuccessMsgModal :title="'Congratulations!'" :message="'You have successfully signed up!'" :isOpen="isModalOpen"
-                @close="handleModalClose" />
+            <SuccessMsgModal :title="'Congratulations!'" :message="'You have successfully signed up!'"
+                :isOpen="isModalOpen" @close="handleModalClose" />
         </div>
     </div>
 </template>
