@@ -1,6 +1,6 @@
-// src/router/index.js
 import { createRouter, createWebHashHistory } from "vue-router";
 import { useAuthStore } from "../stores/auth-store";
+import { usePollsStore } from "../stores/polls-store";
 
 const routes = [
   {
@@ -19,6 +19,11 @@ const routes = [
     component: () => import("../pages/PollListPage.vue"),
     meta: { requiresAuth: true },
   },
+  {
+    path: "/edit-poll/:id",
+    name: "editPollPage",
+    component: () => import("../pages/PollEditPage.vue"),
+  },
 ];
 
 const router = createRouter({
@@ -28,22 +33,29 @@ const router = createRouter({
 
 // Global navigation guard
 router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore();
+  const authStore = useAuthStore();  
+  const pollsStore = usePollsStore();  
 
   const authToken = localStorage.getItem("authToken");
 
+  // Handle authentication checks
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!authToken) {
-      authStore.logout();
+      authStore.logout();  // Log out if no auth token exists
+      next({ name: "PollLoginPage" });  // Redirect to login if not authenticated
     } else {
-      next();
+      next();  // Proceed to the route if authenticated
     }
+  } else if (authToken && (to.name === "PollLoginPage" || to.name === "SignupPage")) {
+    next({ name: "PollPage" });  // Redirect authenticated users away from login/signup
   } else {
-    if (authToken) {
-      next({ name: "PollPage" });
-    } else {
-      next();
-    }
+    next();  // Proceed as normal if no special conditions
+  }
+
+  // Reset polls and fetch fresh polls when navigating to the PollPage
+  if (to.name === "PollPage") {
+    pollsStore.resetPolls();  // Reset polls before fetching new ones
+    // pollsStore.fetchPolls();  // Fetch the latest polls
   }
 });
 

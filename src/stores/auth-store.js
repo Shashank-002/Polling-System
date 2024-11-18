@@ -2,6 +2,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { ref } from "vue";
 import { apiClient } from "../composables/use-api-call";
 import { useRouter } from "vue-router";
+import { usePollsStore } from "./polls-store";
 
 export const useAuthStore = defineStore("auth", () => {
   const state = {
@@ -34,6 +35,9 @@ export const useAuthStore = defineStore("auth", () => {
         user.value = response.data.user;
         localStorage.setItem("userData", JSON.stringify(response.data.user));
         localStorage.setItem("authToken", response.data.token);
+
+        const pollsStore = usePollsStore();
+        pollsStore.resetPolls();
         return { success: true };
       } else {
         return {
@@ -129,6 +133,8 @@ export const useAuthStore = defineStore("auth", () => {
     user.value = null;
     localStorage.removeItem("authToken");
     localStorage.removeItem("userData");
+    const pollsStore = usePollsStore();
+    pollsStore.resetPolls();
     router.push({ name: "PollLoginPage" });
   };
 

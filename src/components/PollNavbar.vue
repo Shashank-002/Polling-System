@@ -1,6 +1,6 @@
 <!-- pollNavbar.vue -->
 <template>
-    <nav class="flex justify-between items-center bg-[#10898d] p-4">
+    <nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center bg-[#10898d] p-4">
         <!-- Left side - Navigation Links -->
         <div class="hidden lg:flex space-x-4">
             <NavItem v-for="(item, index) in menuItems" :key="index" :item="item" :isActive="activeRoute === item.to"
